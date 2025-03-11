@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: ChatGPT API
+  description: API for interacting with OpenAI’s ChatGPT
+  version: 1.0.0
+servers:
+  - url: http://localhost:5001
+paths:
+  /chat:
+    post:
+      summary: Get a response from ChatGPT
+      description: Sends a message to OpenAI’s GPT model and returns a response.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Hello, how are you?"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reply:
+                    type: string
+                    example: "I'm doing great, thanks!"
+        "400":
+          description: Bad request (Missing message)
+        "500":
+          description: Internal server error
