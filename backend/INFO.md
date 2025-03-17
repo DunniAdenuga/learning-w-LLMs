@@ -33,7 +33,7 @@ There is a simple tutorial on how the message system works on the website. Howev
 ```
 
 ## Notes  
-
+- **To terminate the Server use CTRL^C on the terminal  
 - **The message will also show up directly on the terminal of your IDE.** Any errors will also show up there.  
 - **All corresponding errors have a specific code given by OpenAI.**  
 
