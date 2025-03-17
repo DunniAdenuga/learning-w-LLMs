@@ -32,7 +32,11 @@ There is a simple tutorial on how the message system works on the website. Howev
 }
 ```
 
-Note: The message will also show up directly on the terminal of your IDE. Any errors will also show up there.
-Note: All corresponding errors have a specific code given by OpenAI.
+## Notes  
 
-##As of right now, the current model available is ChatGPT 3.5 Turbo
+- **The message will also show up directly on the terminal of your IDE.** Any errors will also show up there.  
+- **All corresponding errors have a specific code given by OpenAI.**  
+
+## Model Information  
+
+As of right now, the current model available is **ChatGPT 3.5 Turbo**.  
