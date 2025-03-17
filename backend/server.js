@@ -36,8 +36,9 @@ app.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    console.log("📨 Received message:", message);
+    console.log("Received message:", message);
 
+    // Choose model
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: message }],
@@ -47,7 +48,7 @@ app.post("/chat", async (req, res) => {
       throw new Error("No response from OpenAI API.");
     }
 
-    console.log("🤖 OpenAI Response:", response.choices[0].message.content);
+    console.log("OpenAI Response:", response.choices[0].message.content);
 
     res.json({ reply: response.choices[0].message.content });
   } catch (error) {
