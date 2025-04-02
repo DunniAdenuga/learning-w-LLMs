@@ -8,8 +8,8 @@ servers:
 paths:
   /chat:
     post:
-      summary: Get a response from ChatGPT
-      description: Sends a message to OpenAI’s GPT model and returns a response.
+      summary: Get a response from ChatGPT for time complexity tutoring
+      description: Sends a message to OpenAI’s GPT model and returns a response based on the user's understanding of time complexity.
       requestBody:
         required: true
         content:
@@ -19,10 +19,10 @@ paths:
               properties:
                 message:
                   type: string
-                  example: "Hello, how are you?"
+                  example: "Can you explain what time complexity is?"
       responses:
         "200":
-          description: Successful response
+          description: Successful response with the tutor's answer
           content:
             application/json:
               schema:
@@ -30,7 +30,7 @@ paths:
                 properties:
                   reply:
                     type: string
-                    example: "I'm doing great, thanks!"
+                    example: "Time complexity is a way to measure how the runtime of an algorithm changes as the input size grows. For example, O(1) means constant time, and O(n) means linear time."
         "400":
           description: Bad request (Missing message)
         "500":

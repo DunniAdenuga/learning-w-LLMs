@@ -5,6 +5,8 @@ const { OpenAI } = require("openai");
 const swaggerUi = require("swagger-ui-express");
 const fs = require("fs");
 const yaml = require("js-yaml");
+const stagesConfig = require("./stages");
+const conversations = {}; // Store conversation history
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -29,28 +31,79 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Function to analyze message and determine stage
+const analyzeStage = async (message) => {
+  const prompt = {
+    role: "system",
+    content: `Based on the following message, determine the learner's stage in their understanding of time complexity. Return just the stage name (e.g., 'stage1') or 'neutral' if it's not related to learning. Message: "${message}"`,
+  };
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [prompt],
+  });
+
+  const stage = response.choices[0].message.content.trim();
+  return stage || "neutral";
+};
+
+// Start conversation flow
 app.post("/chat", async (req, res) => {
   try {
-    const { message } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: "Message is required" });
+    const { message, userId } = req.body;
+    if (!message || !userId) {
+      return res.status(400).json({ error: "Message and userId are required" });
     }
 
-    console.log("Received message:", message);
+    console.log(`User ${userId} sent:`, message);
 
-    // Choose model
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: message }],
-    });
-
-    if (!response.choices || response.choices.length === 0) {
-      throw new Error("No response from OpenAI API.");
+    // Initialize user conversation history if not exists
+    if (!conversations[userId]) {
+      conversations[userId] = [];
     }
 
-    console.log("OpenAI Response:", response.choices[0].message.content);
+    // Store latest 10 messages
+    if (conversations[userId].length >= 10) {
+      conversations[userId].shift(); // Remove oldest message
+    }
+    conversations[userId].push({ role: "user", content: message });
 
-    res.json({ reply: response.choices[0].message.content });
+    // Analyze if message requires stage assessment
+    const learnerStage = await analyzeStage(message);
+    
+    let responseMessage = "";
+    if (learnerStage !== "neutral" && stagesConfig.stages[learnerStage]) {
+      const stageData = stagesConfig.stages[learnerStage];
+
+      const stagePrompt = {
+        role: "system",
+        content: `The learner is at ${stageData.name}. Their current knowledge is: ${stageData.description}. Suggested question: ${stageData.prompts[0]}`,
+      };
+
+      conversations[userId].push(stagePrompt); // Add context
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: conversations[userId],
+      });
+
+      responseMessage = response.choices[0].message.content;
+    } else {
+      // Regular chat if no stage assessment needed
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: conversations[userId],
+      });
+
+      responseMessage = response.choices[0].message.content;
+    }
+
+    // Store assistant response in memory
+    conversations[userId].push({ role: "assistant", content: responseMessage });
+
+    console.log(`Reply to ${userId}:`, responseMessage);
+    res.json({ reply: responseMessage });
+
   } catch (error) {
     console.error("OpenAI API Error:", error.response ? error.response.data : error.message);
     res.status(500).json({ error: "OpenAI API request failed. Check logs for details." });
