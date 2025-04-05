@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: ChatGPT API
+  description: API for interacting with OpenAI’s ChatGPT
+  version: 1.0.0
+servers:
+  - url: http://localhost:5001
+paths:
+  /chat:
+    post:
+      summary: Get a response from ChatGPT for time complexity tutoring
+      description: Sends a message to OpenAI’s GPT model and returns a response based on the user's understanding of time complexity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Can you explain what time complexity is?"
+      responses:
+        "200":
+          description: Successful response with the tutor's answer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reply:
+                    type: string
+                    example: "Time complexity is a way to measure how the runtime of an algorithm changes as the input size grows. For example, O(1) means constant time, and O(n) means linear time."
+        "400":
+          description: Bad request (Missing message)
+        "500":
+          description: Internal server error
