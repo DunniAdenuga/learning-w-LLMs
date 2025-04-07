@@ -6,7 +6,6 @@ const swaggerUi = require("swagger-ui-express");
 const fs = require("fs");
 const yaml = require("js-yaml");
 const systemPrompt = require("./prompts/systemPrompt");
-const prompts = require("./prompts");
 const app = express();
 
 const PORT = process.env.PORT || 5001;
@@ -29,47 +28,40 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Chat handling
+// Chat Handling
 app.post("/chat", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, stage = 1 } = req.body; // Stage is passed in the request
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
 
     // Keep track of user messages
     console.log("User sent:", message);
+    console.log("User stage:", stage);
 
-    // Generates system prompt based on the message
-    const promptMessage = systemPrompt(message);
+    // Generate the system prompt based on the message and stage
+    const promptMessage = systemPrompt(message, stage);
 
-    // Making sure prompt and message are sent correctly
+    // Making the OpenAI API call
     const response = await openai.chat.completions.create({
-      // Define model
       model: "gpt-4o-mini",
-      
-      // Send messages
       messages: [
-        {
-          role: "system", 
-          content: promptMessage.content // Sending the prompt with instructions
-        },
-        {
-          role: "user", 
-          content: message // Sending the actual user message
-        }
+        { role: "system", content: promptMessage.content },
+        { role: "user", content: message },
       ],
     });
 
     const responseMessage = response.choices[0].message.content.trim();
     res.json({ reply: responseMessage });
 
-  // Catch block for error handling
   } catch (error) {
     console.error("OpenAI API Error:", error.response?.data || error.message);
     res.status(500).json({ error: "OpenAI API request failed. Check logs for details." });
   }
 });
+
+
 
 
 // Server is fully running
@@ -80,5 +72,5 @@ app.get("/", (req, res) => {
 // Return if the server runs correctly
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`API Docs available at http://localhost:${PORT}/api-docs`);
+  console.log(`API Docs at http://localhost:${PORT}/api-docs`);
 });

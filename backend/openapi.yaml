@@ -1,15 +1,18 @@
 openapi: 3.0.0
 info:
-  title: ChatGPT API
-  description: API for interacting with OpenAI’s ChatGPT
+  title: Time Complexity Tutor API
   version: 1.0.0
+  description: API for interacting with the Time Complexity Tutor chatbot.
+
 servers:
   - url: http://localhost:5001
+    description: Local server
+
 paths:
   /chat:
     post:
-      summary: Get a response from ChatGPT for time complexity tutoring
-      description: Sends a message to OpenAI’s GPT model and returns a response based on the user's understanding of time complexity.
+      summary: Send a message to the time complexity tutor
+      description: This endpoint allows users to send a message to the tutor and optionally specify their learning stage.
       requestBody:
         required: true
         content:
@@ -19,10 +22,19 @@ paths:
               properties:
                 message:
                   type: string
-                  example: "Can you explain what time complexity is?"
+                  description: The user's message to the tutor
+                  example: "What is time complexity?"
+                stage:
+                  type: integer
+                  description: Optional learning stage (1–4)
+                  minimum: 1
+                  maximum: 4
+                  example: 2
+              required:
+                - message
       responses:
-        "200":
-          description: Successful response with the tutor's answer
+        '200':
+          description: Successful response from the tutor
           content:
             application/json:
               schema:
@@ -30,8 +42,12 @@ paths:
                 properties:
                   reply:
                     type: string
-                    example: "Time complexity is a way to measure how the runtime of an algorithm changes as the input size grows. For example, O(1) means constant time, and O(n) means linear time."
-        "400":
-          description: Bad request (Missing message)
-        "500":
+                    description: The assistant's response
+                    example: "Great question! Time complexity helps us understand how fast an algorithm runs."
+        '400':
+          description: Bad request. Missing message field.
+        '500':
           description: Internal server error
+
+components:
+  schemas: {}
