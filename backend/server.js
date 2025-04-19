@@ -8,6 +8,9 @@ const yaml = require("js-yaml");
 const systemPrompt = require("./prompts/systemPrompt");
 const app = express();
 
+// In-memory conversation history store
+const conversationHistory = {};
+
 const PORT = process.env.PORT || 5001;
 
 app.use(cors());
@@ -31,7 +34,8 @@ const openai = new OpenAI({
 // Chat Handling
 app.post("/chat", async (req, res) => {
   try {
-    const { message, stage = 1 } = req.body; // Stage is passed in the request
+    const { message, stage = 1, sessionId = "default" } = req.body;
+
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
@@ -39,20 +43,27 @@ app.post("/chat", async (req, res) => {
     // Keep track of user messages
     console.log("User sent:", message);
     console.log("User stage:", stage);
+    console.log("Session ID:", sessionId);
 
-    // Generate the system prompt based on the message and stage
-    const promptMessage = systemPrompt(message, stage);
+    // Initialize conversation if not present
+    if (!conversationHistory[sessionId]) {
+      const promptMessage = systemPrompt(message, stage);
+      conversationHistory[sessionId] = [{ role: "system", content: promptMessage.content }];
+    }
 
-    // Making the OpenAI API call
+    // Add user message to history
+    conversationHistory[sessionId].push({ role: "user", content: message });
+
+    // Make the API call with full conversation history
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: promptMessage.content },
-        { role: "user", content: message },
-      ],
+      messages: conversationHistory[sessionId],
     });
 
     const responseMessage = response.choices[0].message.content.trim();
+
+    // Add assistant reply to history
+    conversationHistory[sessionId].push({ role: "assistant", content: responseMessage });   
     res.json({ reply: responseMessage });
 
   } catch (error) {
@@ -60,9 +71,6 @@ app.post("/chat", async (req, res) => {
     res.status(500).json({ error: "OpenAI API request failed. Check logs for details." });
   }
 });
-
-
-
 
 // Server is fully running
 app.get("/", (req, res) => {

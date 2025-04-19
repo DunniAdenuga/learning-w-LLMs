@@ -12,7 +12,7 @@ paths:
   /chat:
     post:
       summary: Send a message to the time complexity tutor
-      description: This endpoint allows users to send a message to the tutor and optionally specify their learning stage.
+      description: This endpoint allows users to send a message to the tutor and optionally specify their learning stage and session ID.
       requestBody:
         required: true
         content:
@@ -30,6 +30,10 @@ paths:
                   minimum: 1
                   maximum: 4
                   example: 2
+                sessionId:
+                  type: string
+                  description: A unique session ID for tracking conversation history
+                  example: "user001"
               required:
                 - message
       responses:
@@ -46,8 +50,25 @@ paths:
                     example: "Great question! Time complexity helps us understand how fast an algorithm runs."
         '400':
           description: Bad request. Missing message field.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Message is required"
         '500':
           description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "OpenAI API request failed. Check logs for details."
 
 components:
   schemas: {}
+
