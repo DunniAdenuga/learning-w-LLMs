@@ -23,12 +23,19 @@ There is a simple tutorial on how the message system works on the website. Howev
 
 - First, click on the **"Try it out"** box on the right side of the screen next to **"Parameters"**.  
 - Once you click **"Try it out"**, you can edit the message accordingly.  
-- Anything inside the quotation marks (shown as `" "`) is considered part of the message.  
+- Anything inside the quotation marks (shown as `" "`) is considered part of the message.
+
+- UPDATE: Apart from the message, with API docs, you are now able to select which stage the user is currently on
+- UPDATE: User ID is how the messages are track dynamically. Please use the same user id throughout the conversation, so that GPT can respond accordingly
+- UPDATE: Different User IDs are saved as different conversations on the server.js
+
 - In the end, the message should look something like:  
 
 ```json
 {
- "message": "Hello, how are you?"
+ "message": "Hello, how are you?",
+ "stage": 2,
+ "user": user1000
 }
 ```
 
@@ -39,4 +46,4 @@ There is a simple tutorial on how the message system works on the website. Howev
 
 ## Model Information  
 
-As of right now, the current model available is **ChatGPT 3.5 Turbo**.  
+As of right now, the current model available is **ChatGPT 4.0 mini**.  
