@@ -1,5 +1,9 @@
 ## How to Run Frontend
-## Backend Info  
+ 
+
+
+
+## How to Run Backend
 
 ### The following are steps on how to run the backend  
 
@@ -47,8 +51,4 @@ There is a simple tutorial on how the message system works on the website. Howev
 
 ## Model Information  
 
-As of right now, the current model available is **ChatGPT 4.0 mini**.  
-
-
-
-## How to Run Backend
+As of right now, the current model available is **ChatGPT 4.0 mini**. 
