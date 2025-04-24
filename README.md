@@ -1,5 +1,19 @@
 ## How to Run Frontend
- 
+ 1. First, you must "cd" into the frontend folder. 
+
+ 2. Once you are inside the frontend folder, "cd" into /my-app.
+
+ 3. In the /my-app, you can now run the command "npm start", and this will prompt you to the web browser.
+
+4. Upon completion, you terminal will read: 
+
+  You can now view my-app in the browser.
+
+  Local:            http://localhost:3000
+  On Your Network:  http://10.24.29.138:3000
+
+
+ 5. You should now be prompted to see the "AI Study Assistant" Landing Page. From there, you can navigate through the UI. 
 
 
 
