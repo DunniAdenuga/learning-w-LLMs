@@ -1,50 +1,29 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './Pages/LandingPage';
+import  SignIn  from './Pages/SignIn';
+import  SignUp  from './Pages/SignUp';
+import ChatInterface from './Pages/ChatInterface';
 
 function App() {
-  const [message, setMessage] = useState('');
-  const [response, setResponse] = useState('');
-
-  const sendMessageToChatGPT = async () => {
-    try {
-      // Make a POST request to OpenAI's API or a similar third-party API
-      const result = await axios.post(
-        'https://api.openai.com/v1/completions', // OpenAI endpoint
-        {
-          model: "gpt-4", // Specify the model you want to use
-          prompt: message, // The message sent from the user
-          max_tokens: 100 // Limit on the number of tokens in the response
-        },
-        {
-          headers: {
-            Authorization: `Bearer YOUR_OPENAI_API_KEY`, // Replace with your API key
-          }
-        }
-      );
-      // Update the state with the response from the API
-      setResponse(result.data.choices[0].text);
-    } catch (error) {
-      console.error('Error while sending message:', error);
-      setResponse('There was an error with the request.');
-    }
-  };
-
   return (
-    <div className="App">
-      <h1>ChatGPT API Frontend</h1>
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type your message..."
-      />
-      <button onClick={sendMessageToChatGPT}>Send Message</button>
-
-      <div>
-        <h2>Response:</h2>
-        <p>{response}</p>
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/chat" element={<ChatInterface />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,94 @@
+/* SignIn.css */
+
+.signin-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+  max-width: 400px;
+  margin: auto;
+  height: 100vh;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.signin-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+.signin-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #1d2c5e;
+  margin-bottom: 2rem;
+}
+
+.signin-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #fff;
+}
+
+.input-icon {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 15px; 
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 1rem;
+  color: #4b5563;
+  padding-left: 2.5rem; /* Make space for the icon inside the input */
+}
+
+.signin-button {
+  background-color: #243e8b;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.signin-button:hover {
+  background-color: #1f346f;
+}
+
+.signup-prompt {
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.signup-prompt a {
+  color: #243e8b;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.signup-prompt a:hover {
+  text-decoration: underline;
+}
+
+
