@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link 
+      rel="stylesheet" 
+      href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css"           
+    />       
+    <title>Login</title>
+</head>
+<body>
+
+    <h1>Login</h1>
+    
+    <ul>
+    <% if(messages.success_msg) { %>
+        <li><%= messages.success_msg %></li>
+        <% } %>
+    </ul>
+
+    <!--Passport will use one of the failure messages defined in passportConfig.js and store them as error messages by passport-->
+    <ul>
+        <% if(messages.error ){ %>
+        <li><%= message.error%></li>
+    <%    } %>
+    </ul>
+
+    <form action="/users/login" method="POST">
+    
+    <div>
+        <input type="email" id="email" name="email" placeholder="Email" required>
+    </div>
+    <div>
+        <input type="password" id="password" name="password" placeholder="Password" required>
+    </div>
+    
+    <div>
+        <input type="submit" value="Login" />
+    </div>
+
+    <a href="/users/register">Register</a>
+    
+</body>
+</html>
