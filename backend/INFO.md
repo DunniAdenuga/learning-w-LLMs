@@ -47,3 +47,4 @@ There is a simple tutorial on how the message system works on the website. Howev
 ## Model Information  
 
 As of right now, the current model available is **ChatGPT 4.0 mini**.  
+

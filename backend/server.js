@@ -1,23 +1,38 @@
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
+console.log("Loaded API Key:", process.env.OPENAI_API_KEY);
+
 const express = require("express");
 const cors = require("cors");
 const { OpenAI } = require("openai");
 const swaggerUi = require("swagger-ui-express");
 const fs = require("fs");
 const yaml = require("js-yaml");
+const mongoose = require("mongoose");
+
 const systemPrompt = require("./prompts/systemPrompt");
+const StudySession = require("./models/StudySession");
+const ChatLog = require("./models/ChatLog");
+const sessionRoutes = require('./routes/sessionRoutes');
+
+
 const app = express();
-
-// In-memory conversation history store
-const conversationHistory = {};
-
 const PORT = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
+app.use("/session", sessionRoutes);
+
+// Connect to MongoDB
+mongoose.connect("mongodb://localhost:27017/ai_edu_app", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+mongoose.connection.once("open", () => {
+  console.log("✅ Connected to MongoDB");
+});
 
 // Load OpenAPI spec
-const openapiSpec = yaml.load(fs.readFileSync("./openapi.yaml", "utf8"));
+const openapiSpec = yaml.load(fs.readFileSync(__dirname + "/openapi.yaml", "utf8"));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiSpec));
 
 // Check for OpenAI API key
@@ -40,31 +55,60 @@ app.post("/chat", async (req, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // Keep track of user messages
+    // Log request
     console.log("User sent:", message);
     console.log("User stage:", stage);
     console.log("Session ID:", sessionId);
 
-    // Initialize conversation if not present
-    if (!conversationHistory[sessionId]) {
-      const promptMessage = systemPrompt(message, stage);
-      conversationHistory[sessionId] = [{ role: "system", content: promptMessage.content }];
+    // Find or create StudySession
+    let session = await StudySession.findOne({ _id: sessionId });
+    if (!session) {
+      session = new StudySession({ _id: sessionId });
+      await session.save();
     }
 
-    // Add user message to history
-    conversationHistory[sessionId].push({ role: "user", content: message });
+    // Save user message
+ const userLog = new ChatLog({
+  sessionId: session._id,
+  message,
+  isUser: true,
+  type: "text",
+  topic: "Algebra",
+  stage,
+  aiModel: "gpt-4o-mini"
+});
+await userLog.save();
 
-    // Make the API call with full conversation history
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: conversationHistory[sessionId],
+
+    // Load previous chat history from database
+    const history = await ChatLog.find({ sessionId: session._id }).sort("timestamp");
+
+    // Format messages for OpenAI API
+    const messages = [{ role: "system", content: systemPrompt(message, stage).content }];
+    history.forEach(entry => {
+      messages.push({
+        role: entry.isUser ? "user" : "assistant",
+        content: entry.message
+      });
     });
 
-    const responseMessage = response.choices[0].message.content.trim();
+    // Call OpenAI
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+    });
 
-    // Add assistant reply to history
-    conversationHistory[sessionId].push({ role: "assistant", content: responseMessage });   
-    res.json({ reply: responseMessage });
+    const reply = response.choices[0].message.content.trim();
+
+    // Save assistant reply
+    const assistantLog = new ChatLog({
+      sessionId: session._id,
+      message: reply,
+      isUser: false,
+    });
+    await assistantLog.save();
+
+    res.json({ reply });
 
   } catch (error) {
     console.error("OpenAI API Error:", error.response?.data || error.message);
@@ -72,12 +116,11 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// Server is fully running
+// Test route
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-// Return if the server runs correctly
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`API Docs at http://localhost:${PORT}/api-docs`);
