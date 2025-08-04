@@ -35,6 +35,9 @@ function SignIn() {
       </form>
 
       <p className="signup-prompt">
+        Forgot your password? <Link to="/resetpassword">Reset Password</Link>
+      </p>
+      <p className="signup-prompt">
         Don’t have an account? <Link to="/signup">Sign Up</Link>
       </p>
     </div>

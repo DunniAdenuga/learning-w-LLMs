@@ -81,6 +81,11 @@
   color: #6b7280;
 }
 
+/* Only affect the bottom part */
+.signup-prompt:last-child {
+  margin-top: 0.5rem; 
+}
+
 .signup-prompt a {
   color: #243e8b;
   font-weight: 500;
@@ -90,5 +95,6 @@
 .signup-prompt a:hover {
   text-decoration: underline;
 }
+
 
 

@@ -1,0 +1,15 @@
+.main-layout {
+  display: flex;
+  flex-direction: row;
+}
+
+.main-content {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+
+  /* Show in the center */
+  display: flex;
+  flex-direction: column;
+}
