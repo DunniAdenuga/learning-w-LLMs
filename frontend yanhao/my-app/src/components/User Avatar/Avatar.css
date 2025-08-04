@@ -1,0 +1,12 @@
+.avatar-floating {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1001; 
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
