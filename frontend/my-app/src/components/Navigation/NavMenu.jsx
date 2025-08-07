@@ -5,11 +5,11 @@ function NavMenu() {
   return (
     <ul className="nav-menu">
       <NavMenuItem to="/" label="Home" />
-      <NavMenuItem to="/profile" label="Profile" />
       <NavMenuItem to="/settings" label="Settings" />
       <NavMenuItem to="/chat" label="Chat History" />
       <NavMenuItem to="/performance" label="Performance" />
       <NavMenuItem to="/favorites" label="Favorites" />
+      <NavMenuItem to="/chatquiz" label="Quiz" />
     </ul>
   );
 }

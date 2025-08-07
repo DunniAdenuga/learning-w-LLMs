@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import '../styles/Favorites.css';
 import { data } from 'react-router-dom';
+import MainLayout from '../layouts/MainLayout';
 
 function Favorites() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -45,41 +46,43 @@ function Favorites() {
     const dataToDisplay = searched ? results : favoriteData;
 
     return (
-     <div className="favorites-container">
-        <h1 className = "favorites-heading"> Favorites</h1>
-        <h3 className ="favorites-description">
-            View bookmarked conversation with AI Study Assistant</h3>
+    <MainLayout>
+        <div className="favorites-container">
+            <h1 className = "favorites-heading"> Favorites</h1>
+            <h3 className ="favorites-description">
+                View bookmarked conversation with AI Study Assistant</h3>
 
-        <div className="favorites-list">
-            <div className = "favorites-search-container">
-                    <input
-                        type="text"
-                        placeholder="Search favorites..."
-                        className = "favorites-search"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <button 
-                    className =  "favorites-search-button" 
-                    onClick={handleSearchClick}>
-                        Search</button>
-            </div>
-            
-            {dataToDisplay.map((group, index) => (
-                <div key={index} className="favorites-group">
-                    <div className="favorites-date">
-                        <h2>{group.date}</h2>
-                    </div>
-                    {group.summaries.map((summary,i) => (
-                        <div key={i} className="favorites-summary">
-                            <p>{summary}</p>
-                        </div>
-                    ))}
+            <div className="favorites-list">
+                <div className = "favorites-search-container">
+                        <input
+                            type="text"
+                            placeholder="Search favorites..."
+                            className = "favorites-search"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button 
+                        className =  "favorites-search-button" 
+                        onClick={handleSearchClick}>
+                            Search</button>
                 </div>
-            )           
-            )}
+                
+                {dataToDisplay.map((group, index) => (
+                    <div key={index} className="favorites-group">
+                        <div className="favorites-date">
+                            <h2>{group.date}</h2>
+                        </div>
+                        {group.summaries.map((summary,i) => (
+                            <div key={i} className="favorites-summary">
+                                <p>{summary}</p>
+                            </div>
+                        ))}
+                    </div>
+                )           
+                )}
+            </div>
         </div>
-    </div>
+    </MainLayout>
     );
 }
 

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import '../styles/ChatInterfaceQUIZ.css';
+import MainLayout from '../layouts/MainLayout';
 
 function ChatInterfaceQUIZ() {
   const [messages, setMessages] = useState([]);
@@ -46,6 +47,7 @@ function ChatInterfaceQUIZ() {
     };
 
   return (
+    <MainLayout>
     <div className="chat-container">
       <h1 className="chat-header">AI Study Assistant</h1>
 
@@ -98,6 +100,7 @@ function ChatInterfaceQUIZ() {
 
       </div>
     </div>
+    </MainLayout>
   );
 }
 
