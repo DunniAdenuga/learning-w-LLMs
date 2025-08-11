@@ -6,7 +6,7 @@ function Avatar() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/profile'); // 
+    navigate('/profile'); 
   };
 
   return (

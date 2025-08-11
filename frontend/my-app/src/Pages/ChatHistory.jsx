@@ -1,11 +1,14 @@
-import React, {useState, Link, useNavigate} from 'react';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import '../styles/ChatHistory.css';
+import MainLayout from '../layouts/MainLayout';
 
 function ChatHistory() {
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState([]); // stores filtered results
     const [searched, setSearched] = useState(false); // tracks if search has been performed
     const [bookmarks, setBookmarks]= useState({});
+    const navigate = useNavigate();
 
     // Sample chat data
     // In a real application, this data would likely come from an API or database
@@ -60,7 +63,13 @@ function ChatHistory() {
       }));
     };
 
+    const handleSummaryClick = (summaryKey) => {
+      // Navigate to the chat page with the summary key
+      navigate(`/summary/${encodeURIComponent(summaryKey)}`);
+    }
+
     return (
+      <MainLayout>
     <div className="chat-history-container">
       <h1 className="chat-history-heading">Chat History</h1>
       <h3 className="chat-history-description">
@@ -95,11 +104,13 @@ function ChatHistory() {
               const summaryKey = `${group.date}-${i}`;
               const isBookmarked = bookmarks[summaryKey];
               return (
-                <div key={i} className="chat-history-summary">
+                <div key={i} className="chat-history-summary" onClick={() => handleSummaryClick(summaryKey)}>
                   <p>{summary}</p>
                   <button
                       className={`bookmark-button ${isBookmarked ? 'bookmarked' : ''}`}
-                      onClick={() => toggleBookmark(summaryKey)}
+                      onClick={(e) => {
+                        e.stopPropagation(); 
+                        toggleBookmark(summaryKey)}}
                   > {isBookmarked ? '★' : '☆'}
                   </button>
                 </div>
@@ -109,65 +120,8 @@ function ChatHistory() {
         ))}
       </div>
     </div>
+    </MainLayout>
   );
 }
 
 export default ChatHistory;
-
-
-
-// return (
-    //     <div className="chat-history-container">
-    //         <h1 className = "chat-history-heading">Chat History</h1>
-    //         <h3 className = "chat-history-description">View your previous conversations 
-    //             with AI Study Assistant</h3>
-
-    //         <div className="chat-history-list">
-    //             <div className = "chat-history-search-container">
-    //                 <input type="text" placeholder="Search..." className="chat-history-search" value ={searchQuery} onChange={(e)=>setSearchQuery(e.target.value)}/>
-    //                 <button className="chat-history-search-button">Search</button>
-    //             </div>
-    //             {/* Placeholder for chat history items */}
-    //             <div className = "chat-history-group">
-    //                 <div className="chat-history-date">
-    //                     <h2>Today</h2>
-    //                 </div>
-    //                 <div className="chat-history-summary">
-    //                     <p>Summary: Discussed study strategies and resources.</p>
-    //                 </div>
-    //                 <div className = "chat-history-summary">
-    //                     <p>Summary: Reviewed previous exam questions and answers.</p>
-    //                 </div>
-    //             </div>
-
-    //             <div className = "chat-history-group">
-    //                 <div className="chat-history-date">
-    //                     <h2>5 days ago</h2>
-    //                 </div>
-    //                 <div className = "chat-history-summary">
-    //                     <p>Summary: Explored new learning techniques and tools.</p>
-    //                 </div>
-    //             </div>
-
-    //             <div className = "chat-history-group">
-    //                 <div className="chat-history-date">
-    //                     <h2>June 20, 2025</h2>
-    //                 </div>
-    //                 <div className = "chat-history-summary">
-    //                     <p>Summary: Explored new learning techniques and tools.</p>
-    //                 </div>
-    //                 <div className = "chat-history-summary">
-    //                     <p>Summary: Discussed exam preparation strategies.</p>
-    //                 </div>
-    //                 <div className = "chat-history-summary">
-    //                     <p>Summary: Reviewed previous exam questions and answers.</p>
-    //                 </div>
-    //                 <div className = "chat-history-summary">
-    //                     <p>Summary: Explored new learning techniques and tools.</p>
-    //                 </div>
-    //             </div>
-
-
-    //         </div>
-    //     </div>
-    // );

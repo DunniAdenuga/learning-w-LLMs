@@ -22,6 +22,8 @@ function ChatInterfaceQUIZ() {
     }, 800); // 800ms delay to simulate thinking
 
     setTimeout(() =>{
+      setQuizAnswered(false); // reset quizAnswered for new quiz
+      // fake AI quiz message - replace with actual AI response logic after
       const aiQuiz = {  
         sender: 'ai',
         type: 'quiz',

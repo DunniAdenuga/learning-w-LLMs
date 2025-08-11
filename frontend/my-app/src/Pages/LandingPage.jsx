@@ -13,23 +13,23 @@ function LandingPage() {
     if (isAuthenticated) {
       navigate("/chat");
     } else {
-      navigate("/signin");
+      navigate("/signin", {state: { from: "/chat" } }); /* Redirect to sign-in with intended destination */
     }
   };
 
   const handleStartExplanation = () => {
     if (isAuthenticated) {
-      navigate("/explanation"); /* explanation page hasn't been designed */
+      navigate("/chatquiz"); /* explanation page hasn't been designed - placeholder : chat (quiz)*/
     } else {
-      navigate("/signin");
+      navigate("/signin", {state: { from: "/chatquiz" } }); /* Redirect to sign-in with intended destination */
     }
   }
 
   const handleStartRevision = () => {
     if (isAuthenticated) {
-      navigate("/Revision"); /* Revision page hasn't been designed */
+      navigate("/chatquiz"); /* Revision page hasn't been designed - placeholder : chat (quiz)*/
     } else {
-      navigate("/signin");
+      navigate("/signin", {state: { from: "/chatquiz" } }); /* Redirect to sign-in with intended destination */
     }
   }
 

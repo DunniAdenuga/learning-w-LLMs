@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import '../styles/Favorites.css';
-import { data } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 
 function Favorites() {
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState([]); // stores filtered results
     const [searched, setSearched] = useState(false); // tracks if search has been performed
+    const navigate = useNavigate();
 
     // Sample favorite data
     // In a real application, this data would likely come from an API or database
@@ -45,6 +46,12 @@ function Favorites() {
     // Decide which data to show (search results or all favorites if no search yet)
     const dataToDisplay = searched ? results : favoriteData;
 
+    const handleSummaryClick = (summaryKey) => {
+      // Navigate to the chat page with the summary key
+      // navigation will change when connected to backend
+      navigate(`/summary/${encodeURIComponent(summaryKey)}`);
+    }
+
     return (
     <MainLayout>
         <div className="favorites-container">
@@ -73,7 +80,7 @@ function Favorites() {
                             <h2>{group.date}</h2>
                         </div>
                         {group.summaries.map((summary,i) => (
-                            <div key={i} className="favorites-summary">
+                            <div key={i} className="favorites-summary" onClick={() => handleSummaryClick(`${group.date}-${i}`)}>
                                 <p>{summary}</p>
                             </div>
                         ))}

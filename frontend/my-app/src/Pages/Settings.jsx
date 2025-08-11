@@ -6,6 +6,11 @@ import PhoneIcon from "../components/Icons-Avatars/PhoneIcon";
 import UserIcon from "../components/Icons-Avatars/UserIcon";
 import defaultProfile from "../components/Icons-Avatars/defaultProfile.png";
 import MainLayout from '../layouts/MainLayout';
+import FontSizeIcon from '../components/Icons-Avatars/FontSizeIcon';
+import AppearanceModeIcon from '../components/Icons-Avatars/ApperanceModeIcon';
+import HistoryIcon from '../components/Icons-Avatars/HistoryIcon';
+import NotificationsIcon from '../components/Icons-Avatars/NotificationsIcon';
+import AccountIcon from '../components/Icons-Avatars/AccountIcon';
 
 function Settings() {
     // State variables for settings
@@ -74,16 +79,19 @@ function Settings() {
                 </div>
 
                 <div className = {`input-group ${darkMode ? 'dark' : ''}`}>
+                    <UserIcon className="input-icon" />
                     <h2 className ={`settings-property ${darkMode ? 'dark':''}`}>Age</h2>
                     <input type="number" placeholder="Enter your age" className={`settings-input ${darkMode ? 'dark':''}`}  />
                 </div>
 
                 <div className = {`input-group ${darkMode ? 'dark' : ''}`}>
+                    <FontSizeIcon className="input-icon" />
                     <h2 className ={`settings-property ${darkMode ? 'dark':''}`}>Fontsize</h2>
                     <input type="range" min="10" max="50" value={fontSize} onChange = {(e) =>setFontSize(e.target.value)} className={`settings-input ${darkMode ? 'dark':''}`}  />
                 </div>
 
                 <div className = {`input-group ${darkMode ? 'dark' : ''}`}>
+                    <AppearanceModeIcon className="input-icon" />
                     <h2 className ={`settings-property ${darkMode ? 'dark':''}`}>Apperance Mode</h2>
                     <div className = "button-container">
                         <button type = "button" className={`settings-button ${darkMode ? 'dark':''}`} onClick = {toggleDarkMode} >
@@ -93,6 +101,7 @@ function Settings() {
                 </div>
 
                 <div className = {`input-group ${darkMode ? 'dark' : ''}`}>
+                    <NotificationsIcon className="input-icon" />
                     <h2 className ={`settings-property ${darkMode ? 'dark':''}`}>Notifications</h2>
                     <div className = "button-container">
                         <button  type = "button" className={`settings-button ${darkMode ? 'dark':''}`} onClick = {toggleNotifications}>
@@ -102,6 +111,7 @@ function Settings() {
                 </div>
 
                 <div className = {`input-group ${darkMode ? 'dark' : ''}`}>
+                    <HistoryIcon className="input-icon" />
                     <h2 className ={`settings-property ${darkMode ? 'dark':''}`}>Delete History</h2>
                     <div className ="button-container">
                         <button type = "button" className={`settings-button ${darkMode ? 'dark':''}`}> Delete </button>
@@ -109,12 +119,13 @@ function Settings() {
                 </div>
 
                 <div className = {`input-group ${darkMode ? 'dark' : ''}`}>
+                    <AccountIcon className="input-icon" />
                     <h2 className ={`settings-property ${darkMode ? 'dark':''}`}>Delete Account</h2>
                     <div className = "button-container">
                         <button type = "button" className={`settings-button ${darkMode ? 'dark':''}`}> Delete </button>
                     </div>
                 </div>
-
+                <button type="submit" className={`settings-button ${darkMode ? 'dark':''}`}>Save Changes</button>
             </form>
         </div>
     </MainLayout>

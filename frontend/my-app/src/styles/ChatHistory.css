@@ -64,7 +64,7 @@
 
 .chat-history-summary:hover{
     background-color: #d1e3f9;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
 }
 
 .chat-history-search-container {
