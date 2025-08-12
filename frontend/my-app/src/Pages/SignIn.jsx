@@ -1,17 +1,20 @@
 "use client";
 import React from "react";
-import { useNavigate, Link } from "react-router-dom"; 
+import { useNavigate, useLocation, Link } from "react-router-dom"; 
 import "../styles/SignIn.css";
 import EmailIcon from "../components/Sign In Components/EmailIcon";
 import LockIcon from "../components/Sign In Components/LockIcon";
 
 function SignIn() {
   const navigate = useNavigate(); 
+  const location = useLocation();
+
+  const from = location.state?.from || "/chat"; // Default to /chat if no state is provided
 
   const handleSubmit = (e) => {
     e.preventDefault(); 
     
-    navigate("/chat"); 
+    navigate(from); // Redirect to the intended destination after sign-in
   };
 
   return (
@@ -34,6 +37,9 @@ function SignIn() {
         <button type="submit" className="signin-button">Sign In</button>
       </form>
 
+      <p className="signup-prompt">
+        Forgot your password? <Link to="/resetpassword">Reset Password</Link>
+      </p>
       <p className="signup-prompt">
         Don’t have an account? <Link to="/signup">Sign Up</Link>
       </p>

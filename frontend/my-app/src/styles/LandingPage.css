@@ -1,12 +1,22 @@
 .landing-container {
+    flex: 1;                  /* Automatically fill the whole space */
+    max-width: 800px;
+    width: 100%;
+    margin-left: 200px;       
+    transition: margin-left 0.3s ease-in-out; 
     text-align: center;
     padding: 2rem 1rem;
     font-family: 'Poppins', sans-serif;
     background-color: #ffffff;
     min-height: 100vh;
-    max-width: 800px;
     margin: 0 auto;
   }
+
+@media (max-width: 768px) {
+  .landing-container {
+    margin-left: 0;         /* ✅ When window is too small, hind the nav bar */
+  }
+}  
   
   /* Navigation */
   .navbar {
@@ -82,6 +92,8 @@
     margin-bottom: 1.5rem;
     transition: background-color 0.3s;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    min-width: 150px; /* Keep the distance between buttons */
+    text-align: center;
   }
   
   .start-btn:hover {
@@ -118,9 +130,12 @@
   
   .start-section {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    justify-content: center;
     margin-bottom: 2rem;
+    gap: 1rem; 
+    margin-bottom: 2rem;
+    flex-wrap: wrap; /* automatically change to a new line when crowded */
   }
   
   .topic-tag {
@@ -133,4 +148,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     margin-top: 0.75rem; /* Add space between button and tag */
   }
+
+  
   

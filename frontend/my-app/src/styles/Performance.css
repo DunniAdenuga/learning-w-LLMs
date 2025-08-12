@@ -1,0 +1,51 @@
+.performance-page {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.card {
+  background-color: #f9fafb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.accuracy-card {
+  text-align: center;
+}
+
+.circle-container {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.circle-chart {
+  width: 100px;
+  height: 100px;
+  background: conic-gradient(#3b82f6 75%, #e5e7eb 0);
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.accuracy-text {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.scores-list {
+  list-style: none;
+  padding: 0;
+}
+
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
