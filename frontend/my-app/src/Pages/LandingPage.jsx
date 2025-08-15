@@ -36,10 +36,7 @@ function LandingPage() {
   return (
     <MainLayout>
       <div className={`landing-container`}>
-        {/* Navigation */}
-        <nav className="navbar">
-          <Link to="/about">About Us</Link>
-        </nav>
+        
 
         {/* Logo Section */}
         <div className="logo-section">
