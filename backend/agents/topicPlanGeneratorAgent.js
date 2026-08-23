@@ -1,4 +1,4 @@
-const { runAgent } = require('./framework/baseAgent');
+const { runAgent, scaledGenerationTimeoutMs } = require('./framework/baseAgent');
 
 const SYSTEM = `You are a curriculum designer. Given course context and strategy, propose draft topics with modules and milestones for an adaptive tutoring app.
 
@@ -174,7 +174,10 @@ ${granularityRule}${coverageTrailer}`;
     systemPrompt: SYSTEM,
     userPrompt,
     maxTokens,
-    temperature: 0.35
+    temperature: 0.35,
+    // Heavy call: the completion scales with `count` (up to 10k tokens), so
+    // the timeout must too — the 15s chat default aborted large syllabi.
+    timeoutMs: scaledGenerationTimeoutMs(count),
   });
 }
 

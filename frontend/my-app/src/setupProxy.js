@@ -12,9 +12,14 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
  * `backend/agents/framework/baseAgent.js` + `routes/analyticsRoutes.js`.
  *
  * This file now:
- *   1. Sets an explicit `proxyTimeout: 20000` so the dev-proxy fails fast
- *      instead of waiting ~120 s for a wedged upstream. 20 s is above our
- *      15 s agent timeout + a few seconds of handler + Mongo overhead.
+ *   1. Sets an explicit `proxyTimeout` so the dev-proxy fails deterministically
+ *      instead of hanging on a wedged upstream. It must exceed the LONGEST
+ *      backend agent timeout: fast chat/probe agents keep 15 s, but the
+ *      topic-plan generate/modify agents scale up to 120 s for large
+ *      enumerated syllabi (baseAgent.scaledGenerationTimeoutMs). 130 s
+ *      leaves handler + Mongo overhead; below that, the proxy cut the
+ *      connection before the backend's clean 503 GENERATION_TIMEOUT could
+ *      arrive and the browser showed a bare "failed to fetch".
  *   2. Distinguishes `ECONNREFUSED` (backend truly down) from a mid-request
  *      socket error (ETIMEDOUT / ECONNRESET / etc.) — the latter almost
  *      always means the handler is slow, not that the server crashed.
@@ -32,7 +37,7 @@ module.exports = function (app) {
       // Hard ceiling on each request. Must be ≥ the agent timeout (15 s)
       // plus handler / Mongo overhead, but short enough that a hung backend
       // doesn't eat an entire browser request slot.
-      proxyTimeout: 20000,
+      proxyTimeout: 130000,
       onError(err, req, res) {
         const code = err?.code || 'UNKNOWN';
         const method = req?.method || '?';

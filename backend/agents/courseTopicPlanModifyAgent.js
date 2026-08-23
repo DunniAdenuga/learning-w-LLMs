@@ -1,4 +1,4 @@
-const { runAgent } = require('./framework/baseAgent');
+const { runAgent, scaledGenerationTimeoutMs } = require('./framework/baseAgent');
 
 /**
  * "Modify draft topics" as a CHANGE SET, not a regeneration.
@@ -185,7 +185,9 @@ Output the CHANGE SET (operations only — do not re-output unchanged drafts).`;
     systemPrompt: SYSTEM,
     userPrompt,
     maxTokens,
-    temperature: 0.35
+    temperature: 0.35,
+    // Same heavy-generation shape as the generator: scale the timeout.
+    timeoutMs: scaledGenerationTimeoutMs(n),
   });
 }
 

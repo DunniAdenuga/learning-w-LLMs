@@ -23,6 +23,28 @@ const {
 const { runTopicPlanGeneratorAgent } = require('../agents/topicPlanGeneratorAgent');
 const { runCourseTopicPlanModifyAgent } = require('../agents/courseTopicPlanModifyAgent');
 const { runTopicDraftModifyAgent } = require('../agents/topicDraftModifyAgent');
+
+/**
+ * Topic-plan generation is a HEAVY agent call (completion scales with topic
+ * count, up to ~10k tokens). When it exceeds its scaled timeout, answer with
+ * a clean, retriable 503 instead of a generic 500 / dropped socket — the
+ * browser used to surface that as a bare "failed to fetch". Applies to the
+ * first attempt AND the validation retry (both run inside the same try).
+ */
+const GENERATION_TIMEOUT_MESSAGE =
+  'Topic generation is taking longer than expected for this syllabus — try again, or split a very large syllabus into fewer topics.';
+function sendGenerationTimeoutIfApplicable(e, res, next) {
+  if (e && e.code === 'AGENT_TIMEOUT' && !res.headersSent) {
+    logger.warn({ reason: e.reason || null }, 'topic-plan generation timed out; returning retriable 503');
+    return res.status(503).json({
+      success: false,
+      code: 'GENERATION_TIMEOUT',
+      retriable: true,
+      error: GENERATION_TIMEOUT_MESSAGE,
+    });
+  }
+  return next(e);
+}
 const { validateTopicPlanPayload, validateTopicPlanOpsPayload, validateSingleTopicPayload, normalizeTopicTitleKey } = require('../agents/validators/topicPlanValidator');
 const { runIngestion } = require('../services/bookIngestionService');
 const SimulationRun = require('../models/SimulationRun');
@@ -932,7 +954,7 @@ router.post('/courses/:courseId/generate-topics', requireCourseOwner, async (req
       }
     });
   } catch (e) {
-    next(e);
+    sendGenerationTimeoutIfApplicable(e, res, next);
   }
 });
 
@@ -1508,7 +1530,7 @@ router.post('/courses/:courseId/topic-plan/generate', requireCourseOwner, async 
       kind: 'generate'
     });
   } catch (e) {
-    next(e);
+    sendGenerationTimeoutIfApplicable(e, res, next);
   }
 });
 
@@ -1528,7 +1550,7 @@ router.post('/courses/:courseId/topic-plan/modify', requireCourseOwner, async (r
       kind: 'modify'
     });
   } catch (e) {
-    next(e);
+    sendGenerationTimeoutIfApplicable(e, res, next);
   }
 });
 
@@ -1607,3 +1629,6 @@ router.post('/courses/:courseId/topics/:topicId/ai-modify', requireCourseTopicOw
 });
 
 module.exports = router;
+// Exported for unit tests: the retriable-timeout contract for heavy generation routes.
+module.exports.sendGenerationTimeoutIfApplicable = sendGenerationTimeoutIfApplicable;
+module.exports.GENERATION_TIMEOUT_MESSAGE = GENERATION_TIMEOUT_MESSAGE;

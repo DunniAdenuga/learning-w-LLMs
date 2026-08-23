@@ -10,6 +10,23 @@ const { getModelForTask } = require('./modelRouter');
 const DEFAULT_AGENT_TIMEOUT_MS = 15000;
 
 /**
+ * Timeout for HEAVY generation calls whose completion size scales with the
+ * number of items produced (topic-plan generate/modify: up to ~10-11k
+ * tokens). The 15s default is sized for 1-3s chat agents and aborted a
+ * 14-unit syllabus generation every time (AGENT_TIMEOUT -> dropped
+ * connection -> "failed to fetch"). 30s base + per-item headroom, capped
+ * at 120s so a runaway call still ends well inside Cloud Run's request
+ * timeout. Small plans keep finishing fast — only the ceiling moves.
+ */
+const HEAVY_GENERATION_BASE_MS = 30000;
+const HEAVY_GENERATION_PER_ITEM_MS = 5000;
+const HEAVY_GENERATION_CAP_MS = 120000;
+function scaledGenerationTimeoutMs(itemCount) {
+  const n = Number.isFinite(itemCount) && itemCount > 0 ? itemCount : 4;
+  return Math.min(HEAVY_GENERATION_CAP_MS, HEAVY_GENERATION_BASE_MS + n * HEAVY_GENERATION_PER_ITEM_MS);
+}
+
+/**
  * Throws the tagged timeout error our route-level handlers recognize.
  * Using a stable `err.code` ('AGENT_TIMEOUT') means callers don't have to
  * string-match the message — they can branch on the code and return a
@@ -272,4 +289,4 @@ function safeSample(value) {
   }
 }
 
-module.exports = { runAgent, runAgentWithTools };
+module.exports = { runAgent, runAgentWithTools, scaledGenerationTimeoutMs, DEFAULT_AGENT_TIMEOUT_MS };
