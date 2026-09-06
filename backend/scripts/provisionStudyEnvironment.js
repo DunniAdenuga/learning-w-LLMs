@@ -297,7 +297,7 @@ async function rollbackMaya(db, { dryRun }) {
 }
 
 // ---------- cloning ----------
-async function cloneCourseForAccount(db, { course, latestActivity }, ownerId, anchor, dryRun) {
+async function cloneCourseForAccount(db, { course, latestActivity }, ownerId, anchor, dryRun, overrides = {}) {
   const deltaMs = anchor.getTime() - latestActivity.getTime();
   const topics = await db.collection('coursetopics').find({ courseId: course._id }).toArray();
   const enrollments = await db.collection('enrollments').find({ courseId: course._id }).toArray();
@@ -314,11 +314,22 @@ async function cloneCourseForAccount(db, { course, latestActivity }, ownerId, an
     return { courseId: newCourseId.toString(), accessCode };
   }
 
+  // Anonymized-figure support (2026-08): a clone may override the template's
+  // title and substitute a literal in globalInstructions (e.g. strip the
+  // institutional course code). Everything else clones unchanged.
+  const cloneTitle = overrides.courseTitle || course.title;
+  let cloneGI = course.globalInstructions;
+  if (overrides.instructionsSub && typeof cloneGI === 'string') {
+    const [find, replace] = overrides.instructionsSub.split('=>');
+    if (find && cloneGI.includes(find)) cloneGI = cloneGI.split(find).join(replace ?? '');
+  }
   await db.collection('courses').insertOne({
     ...course,
     _id: newCourseId,
     instructorId: ownerId,
     accessCode,
+    title: cloneTitle,
+    ...(cloneGI !== course.globalInstructions ? { globalInstructions: cloneGI } : {}),
     createdAt: shiftDate(course.createdAt, deltaMs),
     updatedAt: shiftDate(course.updatedAt, deltaMs),
     instructorChat: [], // clones start with a fresh plan-chat too
@@ -418,25 +429,46 @@ async function provision(db, { dryRun }) {
   if (!mayaPresent) die('Maya is not seeded in the template — run seed-maya first');
 
   const manifest = { createdAt: new Date().toISOString(), templateCourseId: template.course._id.toString(), anchor: anchor.toISOString(), accounts: [] };
+  const intoExisting = hasFlag('into-existing');
+  const overrides = {
+    courseTitle: arg('course-title', null),
+    instructionsSub: arg('instructions-sub', null),
+  };
   for (const label of labels) {
     const username = `study_${label.toLowerCase()}`;
-    if (await db.collection('users').findOne({ username })) die(`account ${username} already exists — rollback first`);
-    const password = genPassword();
-    const userId = newId();
-    console.log(`\n[${label}] account ${username}`);
-    if (!dryRun) {
-      await db.collection('users').insertOne({
-        _id: userId,
-        username,
-        passwordHash: await hashPassword(password),
-        name: `Participant ${label}`,
-        role: 'instructor',
-        profile: { isSynthetic: false, onboardingCompleted: true },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+    const existing = await db.collection('users').findOne({ username });
+    let password;
+    let userId;
+    if (existing) {
+      // --into-existing (2026-08, P14 reseed): reuse the account so the
+      // login, the user id (pinned in STUDY_PROBE_USERS) and the password
+      // stay stable; only the clone is new. The prior manifest supplies the
+      // password for the new manifest entry so prep-session keeps working.
+      if (!intoExisting) die(`account ${username} already exists — rollback first (or pass --into-existing)`);
+      if (existing.role !== 'instructor') die(`${username} exists but is not an instructor`);
+      userId = existing._id;
+      const prior = findTarget(label);
+      if (!prior || !prior.password) die(`--into-existing needs ${label}'s password from a prior manifest, none found`);
+      password = prior.password;
+      console.log(`\n[${label}] REUSING existing account ${username} (${userId})`);
+    } else {
+      password = genPassword();
+      userId = newId();
+      console.log(`\n[${label}] account ${username}`);
+      if (!dryRun) {
+        await db.collection('users').insertOne({
+          _id: userId,
+          username,
+          passwordHash: await hashPassword(password),
+          name: `Participant ${label}`,
+          role: 'instructor',
+          profile: { isSynthetic: false, onboardingCompleted: true },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
     }
-    const clone = await cloneCourseForAccount(db, template, userId, anchor, dryRun);
+    const clone = await cloneCourseForAccount(db, template, userId, anchor, dryRun, overrides);
     console.log(`[${label}] clone courseId=${clone.courseId} accessCode=${clone.accessCode}`);
     if (!dryRun) {
       console.log(`[${label}] acceptance checks:`);
